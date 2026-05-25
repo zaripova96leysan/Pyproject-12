@@ -55,3 +55,22 @@ descriptions = list(transaction_descriptions(transactions))
 # Номера карт
 cards = list(card_number_generator(1, 5))
 # ['0000 0000 0000 0001', '0000 0000 0000 0002', '0000 0000 0000 0003', '0000 0000 0000 0004']
+
+## Модуль decorators 
+
+Декоратор `log` для логирования работы функций.
+
+### Использование
+
+```python
+from src.decorators import log
+
+# Логирование в консоль
+@log()
+def add(a, b):
+    return a + b
+
+# Логирование в файл
+@log(filename="mylog.txt")
+def multiply(a, b):
+    return a * b
