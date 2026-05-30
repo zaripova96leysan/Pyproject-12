@@ -38,5 +38,5 @@ def get_date(date_string: str) -> str:
             return date_string
         year, month, day = parts
         return f"{day}.{month}.{year}"
-    except (ValueError, AttributeError, IndexError):
+    except ValueError, AttributeError, IndexError:
         return date_string

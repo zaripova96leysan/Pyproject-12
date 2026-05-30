@@ -2,13 +2,12 @@ import os
 import pytest
 import sys
 
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.decorators import log
 
-
 # ========== ПРОСТЫЕ ФУНКЦИИ ДЛЯ ТЕСТИРОВАНИЯ ==========
+
 
 @log()
 def add(a: int, b: int) -> int:
@@ -29,6 +28,7 @@ def divide(a: int, b: int) -> float:
 
 
 # ========== ТЕСТЫ ==========
+
 
 def test_log_to_console(capsys):
     """Тест: логирование в консоль."""
@@ -53,7 +53,7 @@ def test_log_to_file():
     assert os.path.exists(test_file)
 
     # Проверяем содержимое
-    with open(test_file, 'r', encoding='utf-8') as f:
+    with open(test_file, "r", encoding="utf-8") as f:
         content = f.read()
         assert "multiply ok" in content
 
@@ -77,17 +77,17 @@ def test_log_error_to_file():
     if os.path.exists(test_file):
         os.remove(test_file)
 
-    @log(filename = test_file)
+    @log(filename=test_file)
     def faulty_function(x: int) -> int:
         """Функция, которая падает."""
-        return x/0
+        return x / 0
 
     with pytest.raises(ZeroDivisionError):
         faulty_function(42)
 
     assert os.path.exists(test_file)
 
-    with open(test_file, 'r', encoding='utf-8') as f:
+    with open(test_file, "r", encoding="utf-8") as f:
         content = f.read()
         assert "faulty_function error: ZeroDivisionError" in content
         assert "Inputs: (42,), {}" in content
@@ -120,7 +120,7 @@ def test_log_multiple_calls(tmp_path):
     for i in range(3):
         counter(i)
 
-    with open(log_file, 'r', encoding='utf-8') as f:
+    with open(log_file, "r", encoding="utf-8") as f:
         lines = f.readlines()
         assert len(lines) == 3
         for line in lines:

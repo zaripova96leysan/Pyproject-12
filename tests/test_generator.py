@@ -2,9 +2,13 @@ import pytest
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
+from src.generators import (
+    filter_by_currency,
+    transaction_descriptions,
+    card_number_generator,
+)
 
 
 # Фикстура с тестовыми данными
@@ -15,22 +19,23 @@ def transactions():
         {
             "id": 1,
             "description": "Перевод другу",
-            "operationAmount": {"amount": "100", "currency": {"code": "USD"}}
+            "operationAmount": {"amount": "100", "currency": {"code": "USD"}},
         },
         {
             "id": 2,
             "description": "Покупка в магазине",
-            "operationAmount": {"amount": "200", "currency": {"code": "EUR"}}
+            "operationAmount": {"amount": "200", "currency": {"code": "EUR"}},
         },
         {
             "id": 3,
             "description": "Оплата услуг",
-            "operationAmount": {"amount": "300", "currency": {"code": "USD"}}
+            "operationAmount": {"amount": "300", "currency": {"code": "USD"}},
         },
     ]
 
 
 # ========== ТЕСТЫ ДЛЯ filter_by_currency ==========
+
 
 def test_filter_by_currency_usd(transactions):
     """Фильтрация по USD."""
@@ -61,6 +66,7 @@ def test_filter_by_currency_empty_list():
 
 # ========== ТЕСТЫ ДЛЯ transaction_descriptions ==========
 
+
 def test_transaction_descriptions(transactions):
     """Получение описаний."""
     result = list(transaction_descriptions(transactions))
@@ -75,11 +81,15 @@ def test_transaction_descriptions_empty():
 
 # ========== ТЕСТЫ ДЛЯ card_number_generator ==========
 
-@pytest.mark.parametrize("start, stop, expected", [
-    (1, 3, ["0000 0000 0000 0001", "0000 0000 0000 0002"]),
-    (0, 2, ["0000 0000 0000 0000", "0000 0000 0000 0001"]),
-    (9999, 10001, ["0000 0000 0000 9999", "0000 0000 0001 0000"]),
-])
+
+@pytest.mark.parametrize(
+    "start, stop, expected",
+    [
+        (1, 3, ["0000 0000 0000 0001", "0000 0000 0000 0002"]),
+        (0, 2, ["0000 0000 0000 0000", "0000 0000 0000 0001"]),
+        (9999, 10001, ["0000 0000 0000 9999", "0000 0000 0001 0000"]),
+    ],
+)
 def test_card_number_generator(start, stop, expected):
     """Генерация номеров карт."""
     result = list(card_number_generator(start, stop))
