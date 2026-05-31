@@ -6,12 +6,7 @@ from typing import Any, Dict, List
 import requests
 from dotenv import load_dotenv
 
-
 load_dotenv()
-
-
-API_KEY = os.getenv("EXCHANGE_API_KEY")
-API_URL = os.getenv("EXCHANGE_API_URL", "https://api.exchangerate-api.com/v4/latest")
 
 
 def load_transactions_from_json(file_path: str) -> List[Dict[str, Any]]:
@@ -35,72 +30,56 @@ def load_transactions_from_json(file_path: str) -> List[Dict[str, Any]]:
 
 def convert_to_rub(transaction: Dict[str, Any]) -> float:
     """Конвертирует сумму транзакции из USD или EUR в рубли."""
-
+    # 1. Извлечение данных из словаря
     amount = transaction.get('amount')
     currency = transaction.get('currency')
 
-
     if amount is None or currency is None:
         return 0.0
-
 
     try:
         amount = float(amount)
     except (ValueError, TypeError):
         return 0.0
 
-
     currency = str(currency).upper()
 
-
+    # 2. Возврат значения для RUB
     if currency == 'RUB':
         return amount
 
-
+    # Конвертируем только USD и EUR
     if currency not in ['USD', 'EUR']:
         return 0.0
 
+    # 3. Получаем API ключ
+    API_KEY = os.getenv('EXCHANGE_API_KEY')
 
+    # 4. Правильный URL запроса
+    url = f"https://api.exchangerate-api.com/v4/latest/{currency}"
+
+    # 5. Передача API-ключа в заголовках
+    headers = {
+        'api-key': API_KEY if API_KEY else '',
+        'Authorization': f'Bearer {API_KEY}' if API_KEY else ''
+    }
+
+    # 6. Обращение к внешнему API
     try:
-        url = f"{API_URL}/{currency}"
-        headers = {}
-        if API_KEY:
-            headers['apikey'] = API_KEY
-
-
         response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
 
-
+        # 7. Извлечение значения из ответа API
         data = response.json()
-
-
-        rub_rate = None
-
-
-        if 'rates' in data and 'RUB' in data['rates']:
-            rub_rate = data['rates']['RUB']
-
-        elif 'data' in data and 'RUB' in data['data']:
-            rub_rate = data['data']['RUB']
-
-        elif 'RUB' in data:
-            rub_rate = data['RUB']
-
+        rub_rate = data.get('rates', {}).get('RUB')
 
         if rub_rate is None:
             return 0.0
 
+        rub_rate = float(rub_rate)
 
-        try:
-            rub_rate = float(rub_rate)
-        except (ValueError, TypeError):
-            return 0.0
-
-
+        # 8. Возврат float значения
         result = amount * rub_rate
         return round(result, 2)
 
-    except (requests.RequestException, KeyError, ValueError, TypeError) as e:
-        print(f"Ошибка конвертации: {e}")
+    except Exception:
         return 0.0
