@@ -6,9 +6,11 @@ from typing import Any, Dict, List
 import requests
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
-API_KEY = os.getenv("EXCHANGE_API_KEY", "")
+
+API_KEY = os.getenv("EXCHANGE_API_KEY")
 API_URL = os.getenv("EXCHANGE_API_URL", "https://api.exchangerate-api.com/v4/latest")
 
 
@@ -33,27 +35,72 @@ def load_transactions_from_json(file_path: str) -> List[Dict[str, Any]]:
 
 def convert_to_rub(transaction: Dict[str, Any]) -> float:
     """Конвертирует сумму транзакции из USD или EUR в рубли."""
-    amount = transaction.get('amount', 0.0)
-    currency = transaction.get('currency', 'RUB').upper()
+
+    amount = transaction.get('amount')
+    currency = transaction.get('currency')
+
+
+    if amount is None or currency is None:
+        return 0.0
+
+
+    try:
+        amount = float(amount)
+    except (ValueError, TypeError):
+        return 0.0
+
+
+    currency = str(currency).upper()
+
 
     if currency == 'RUB':
-        return float(amount)
+        return amount
+
 
     if currency not in ['USD', 'EUR']:
         return 0.0
 
+
     try:
         url = f"{API_URL}/{currency}"
-        params = {'apikey': API_KEY} if API_KEY else {}
+        headers = {}
+        if API_KEY:
+            headers['apikey'] = API_KEY
 
-        response = requests.get(url, params=params, timeout=5)
+
+        response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
 
-        rates = response.json().get('rates', {})
-        rub_rate = rates.get('RUB')
 
-        if rub_rate:
-            return round(float(amount) * rub_rate, 2)
-        return 0.0
-    except Exception:
+        data = response.json()
+
+
+        rub_rate = None
+
+
+        if 'rates' in data and 'RUB' in data['rates']:
+            rub_rate = data['rates']['RUB']
+
+        elif 'data' in data and 'RUB' in data['data']:
+            rub_rate = data['data']['RUB']
+
+        elif 'RUB' in data:
+            rub_rate = data['RUB']
+
+
+        if rub_rate is None:
+            return 0.0
+
+
+        try:
+            rub_rate = float(rub_rate)
+        except (ValueError, TypeError):
+            return 0.0
+
+
+        result = amount * rub_rate
+        return round(result, 2)
+
+    except (requests.RequestException, KeyError, ValueError, TypeError) as e:
+        print(f"Ошибка конвертации: {e}")
         return 0.0
