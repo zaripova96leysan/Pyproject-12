@@ -8,9 +8,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+API_KEY = os.getenv("EXCHANGE_API_KEY")
+
 
 def load_transactions_from_json(file_path: str) -> List[Dict[str, Any]]:
-    """Загружает список транзакций из JSON-файла."""
+    """
+    Загружает список транзакций из JSON-файла.
+
+    Args:
+        file_path (str): Путь к JSON-файлу
+
+    Returns:
+        List[Dict[str, Any]]: Список транзакций или пустой список
+    """
     try:
         if not Path(file_path).exists():
             return []
@@ -29,56 +39,57 @@ def load_transactions_from_json(file_path: str) -> List[Dict[str, Any]]:
 
 
 def convert_to_rub(transaction: Dict[str, Any]) -> float:
-    """Конвертирует сумму транзакции из USD или EUR в рубли."""
-    # 1. Извлечение данных из словаря
-    amount = transaction.get('amount')
-    currency = transaction.get('currency')
+    """
+    Конвертирует сумму транзакции из USD или EUR в рубли.
 
-    if amount is None or currency is None:
+    Args:
+        transaction (Dict[str, Any]): Словарь с данными транзакции
+
+    Returns:
+        float: Сумма в рублях или 0.0 при ошибке
+    """
+    # Правильное извлечение данных из вложенной структуры
+    operation_amount = transaction.get('operationAmount')
+
+    if operation_amount is None:
+        return 0.0
+
+    amount_str = operation_amount.get('amount')
+    currency_info = operation_amount.get('currency', {})
+    currency_code = currency_info.get('code')
+
+    if amount_str is None or currency_code is None:
         return 0.0
 
     try:
-        amount = float(amount)
+        amount = float(amount_str)
     except (ValueError, TypeError):
         return 0.0
 
-    currency = str(currency).upper()
+    currency = str(currency_code).upper()
 
-    # 2. Возврат значения для RUB
     if currency == 'RUB':
         return amount
 
-    # Конвертируем только USD и EUR
     if currency not in ['USD', 'EUR']:
         return 0.0
 
-    # 3. Получаем API ключ
-    API_KEY = os.getenv('EXCHANGE_API_KEY')
-
-    # 4. Правильный URL запроса
     url = f"https://api.exchangerate-api.com/v4/latest/{currency}"
+    headers = {'api-key': API_KEY} if API_KEY else {}
 
-    # 5. Передача API-ключа в заголовках
-    headers = {
-        'api-key': API_KEY if API_KEY else '',
-        'Authorization': f'Bearer {API_KEY}' if API_KEY else ''
-    }
-
-    # 6. Обращение к внешнему API
     try:
         response = requests.get(url, headers=headers, timeout=10)
 
-        # 7. Извлечение значения из ответа API
+        if response.status_code != 200:
+            return 0.0
+
         data = response.json()
         rub_rate = data.get('rates', {}).get('RUB')
 
         if rub_rate is None:
             return 0.0
 
-        rub_rate = float(rub_rate)
-
-        # 8. Возврат float значения
-        result = amount * rub_rate
+        result = amount * float(rub_rate)
         return round(result, 2)
 
     except Exception:
