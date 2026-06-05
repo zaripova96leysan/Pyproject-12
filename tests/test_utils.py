@@ -1,114 +1,75 @@
 import json
 from unittest.mock import Mock, mock_open, patch
 
-from src.utils import convert_to_rub, load_transactions_from_json
+import pytest
+import requests
+
+from src.utils import convert_to_rub, load_transaction
 
 
-class TestLoadTransactionsFromJson:
-    """Тесты для функции загрузки транзакций из JSON"""
+def test_load_transaction_success():
+    """Тест успешной загрузки транзакций"""
+    fake_data = [{"id": 1, "name": "test"}]
+    json_string = json.dumps(fake_data)
 
-    def test_successful_load(self):
-        """Тест успешной загрузки данных"""
-        mock_data = [
-            {
-                "id": 1,
-                "operationAmount": {
-                    "amount": "100.50",
-                    "currency": {"code": "USD"}
-                }
-            },
-            {
-                "id": 2,
-                "operationAmount": {
-                    "amount": "200.00",
-                    "currency": {"code": "EUR"}
-                }
-            }
-        ]
-
-        with patch('builtins.open', mock_open(read_data=json.dumps(mock_data))):
-            with patch('pathlib.Path.exists', return_value=True):
-                result = load_transactions_from_json("test.json")
-                assert len(result) == 2
-
-    def test_empty_file(self):
-        """Тест пустого файла"""
-        with patch('builtins.open', mock_open(read_data="")):
-            with patch('pathlib.Path.exists', return_value=True):
-                result = load_transactions_from_json("empty.json")
-                assert result == []
-
-    def test_file_not_found(self):
-        """Тест отсутствующего файла"""
-        with patch('pathlib.Path.exists', return_value=False):
-            result = load_transactions_from_json("missing.json")
-            assert result == []
+    with patch("builtins.open", mock_open(read_data=json_string)):
+        result = load_transaction("any.json")
+    # Функция должна вернуть загруженные данные
+    assert result == fake_data
+    assert len(result) == 1
+    assert result[0]["id"] == 1
 
 
-class TestConvertToRub:
-    """Тесты для функции конвертации валюты"""
+def test_load_transaction_empty_list():
+    """Тест загрузки пустого списка"""
+    fake_data = []
+    json_string = json.dumps(fake_data)
 
-    def test_rub_no_conversion_needed(self):
-        """Тест: RUB не требует конвертации"""
-        transaction = {
-            "operationAmount": {
-                "amount": "1000.50",
-                "currency": {"code": "RUB"}
-            }
+    with patch("builtins.open", mock_open(read_data=json_string)):
+        result = load_transaction("empty.json")
+    assert result == []
+
+
+def test_load_transaction_not_list():
+    """Тест загрузки данных не в виде списка"""
+    fake_data = {"key": "value"}
+    json_string = json.dumps(fake_data)
+
+    with patch("builtins.open", mock_open(read_data=json_string)):
+        result = load_transaction("not_list.json")
+    assert result == []
+
+
+def test_load_transaction_invalid_json():
+    """Тест загрузки некорректного JSON"""
+    with patch("builtins.open", mock_open(read_data="invalid json")):
+        result = load_transaction("invalid.json")
+    assert result == []
+
+
+def test_convert_to_rub_rub():
+    """Тест конвертации RUB (без конвертации)"""
+    transaction = {
+        "operationAmount": {
+            "amount": "100",
+            "currency": {"code": "RUB"}
         }
-        result = convert_to_rub(transaction)
-        assert isinstance(result, float)
-        assert result == 1000.50
+    }
+    result = convert_to_rub(transaction)
+    assert result == 100.0
+    assert isinstance(result, float)
 
-    def test_missing_amount_returns_zero(self):
-        """Тест: отсутствует сумма"""
-        transaction = {
-            "operationAmount": {
-                "currency": {"code": "USD"}
-            }
-        }
-        result = convert_to_rub(transaction)
-        assert isinstance(result, float)
-        assert result == 0.0
 
-    def test_missing_currency_returns_zero(self):
-        """Тест: отсутствует валюта"""
-        transaction = {
-            "operationAmount": {
-                "amount": "100"
-            }
-        }
-        result = convert_to_rub(transaction)
-        assert isinstance(result, float)
-        assert result == 0.0
+def test_convert_to_rub_usd_success():
+    """Тест успешной конвертации USD в RUB"""
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "result": "success",
+        "rates": {"RUB": 90.50}
+    }
 
-    def test_missing_operation_amount_returns_zero(self):
-        """Тест: отсутствует operationAmount"""
-        transaction = {"id": 1}
-        result = convert_to_rub(transaction)
-        assert isinstance(result, float)
-        assert result == 0.0
-
-    def test_invalid_amount_returns_zero(self):
-        """Тест: некорректная сумма"""
-        transaction = {
-            "operationAmount": {
-                "amount": "not a number",
-                "currency": {"code": "USD"}
-            }
-        }
-        result = convert_to_rub(transaction)
-        assert isinstance(result, float)
-        assert result == 0.0
-
-    @patch('src.utils.requests.get')
-    def test_usd_to_rub_successful(self, mock_get):
-        """Тест: успешная конвертация USD в RUB"""
-        mock_response = Mock()
-        mock_response.json.return_value = {"rates": {"RUB": 92.75}}
-        mock_response.status_code = 200
-        mock_get.return_value = mock_response
-
+    with patch("src.utils.requests.get", return_value=mock_response):
         transaction = {
             "operationAmount": {
                 "amount": "100",
@@ -116,18 +77,21 @@ class TestConvertToRub:
             }
         }
         result = convert_to_rub(transaction)
-
+        expected = 100 * 90.5
+        assert result == expected
         assert isinstance(result, float)
-        assert result == 9275.0
 
-    @patch('src.utils.requests.get')
-    def test_eur_to_rub_successful(self, mock_get):
-        """Тест: успешная конвертация EUR в RUB"""
-        mock_response = Mock()
-        mock_response.json.return_value = {"rates": {"RUB": 100.30}}
-        mock_response.status_code = 200
-        mock_get.return_value = mock_response
 
+def test_convert_to_rub_eur_success():
+    """Тест успешной конвертации EUR в RUB"""
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "result": "success",
+        "rates": {"RUB": 95.0}
+    }
+
+    with patch("src.utils.requests.get", return_value=mock_response):
         transaction = {
             "operationAmount": {
                 "amount": "50",
@@ -135,15 +99,14 @@ class TestConvertToRub:
             }
         }
         result = convert_to_rub(transaction)
-
+        expected = 50 * 95.0
+        assert result == expected
         assert isinstance(result, float)
-        assert result == 5015.0
 
-    @patch('src.utils.requests.get')
-    def test_api_error_returns_zero(self, mock_get):
-        """Тест: ошибка API возвращает 0.0"""
-        mock_get.side_effect = Exception("API connection error")
 
+def test_convert_to_rub_requests_exception():
+    """Тест обработки исключения requests"""
+    with patch("src.utils.requests.get", side_effect=requests.RequestException("Network error")):
         transaction = {
             "operationAmount": {
                 "amount": "100",
@@ -151,18 +114,101 @@ class TestConvertToRub:
             }
         }
         result = convert_to_rub(transaction)
-
-        assert isinstance(result, float)
         assert result == 0.0
+        assert isinstance(result, float)
 
-    def test_unsupported_currency(self):
-        """Тест: неподдерживаемая валюта"""
+
+def test_convert_to_rub_api_error_status():
+    """Тест обработки ошибки API (статус не 200)"""
+    mock_response = Mock()
+    mock_response.status_code = 404
+
+    with patch("src.utils.requests.get", return_value=mock_response):
         transaction = {
             "operationAmount": {
                 "amount": "100",
-                "currency": {"code": "GBP"}
+                "currency": {"code": "USD"}
             }
         }
         result = convert_to_rub(transaction)
-        assert isinstance(result, float)
         assert result == 0.0
+        assert isinstance(result, float)
+
+
+def test_convert_to_rub_missing_rub_key():
+    """Тест отсутствия ключа RUB в ответе API"""
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "result": "success",
+        "rates": {"USD": 1.0}
+    }
+
+    with patch("src.utils.requests.get", return_value=mock_response):
+        transaction = {
+            "operationAmount": {
+                "amount": "100",
+                "currency": {"code": "USD"}
+            }
+        }
+        result = convert_to_rub(transaction)
+        assert result == 0.0
+        assert isinstance(result, float)
+
+
+def test_convert_to_rub_missing_operation_amount():
+    """Тест отсутствия operationAmount в транзакции"""
+    transaction = {"id": 1}
+    result = convert_to_rub(transaction)
+    assert result == 0.0
+    assert isinstance(result, float)
+
+
+def test_convert_to_rub_missing_amount():
+    """Тест отсутствия amount в транзакции"""
+    transaction = {
+        "operationAmount": {
+            "currency": {"code": "USD"}
+        }
+    }
+    result = convert_to_rub(transaction)
+    assert result == 0.0
+    assert isinstance(result, float)
+
+
+def test_convert_to_rub_missing_currency():
+    """Тест отсутствия currency в транзакции"""
+    transaction = {
+        "operationAmount": {
+            "amount": "100"
+        }
+    }
+    result = convert_to_rub(transaction)
+    assert result == 0.0
+    assert isinstance(result, float)
+
+
+def test_convert_to_rub_invalid_amount():
+    """Тест некорректного значения суммы"""
+    transaction = {
+        "operationAmount": {
+            "amount": "not_a_number",
+            "currency": {"code": "USD"}
+        }
+    }
+    result = convert_to_rub(transaction)
+    assert result == 0.0
+    assert isinstance(result, float)
+
+
+def test_convert_to_rub_unsupported_currency():
+    """Тест неподдерживаемой валюты"""
+    transaction = {
+        "operationAmount": {
+            "amount": "100",
+            "currency": {"code": "GBP"}
+        }
+    }
+    result = convert_to_rub(transaction)
+    assert result == 0.0
+    assert isinstance(result, float)
