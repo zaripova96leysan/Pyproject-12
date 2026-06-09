@@ -51,6 +51,11 @@ d = ["aiohttp (>=3.10)"]
 jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2) ; sys_platform != \"win32\"", "winloop (>=0.5.0) ; sys_platform == \"win32\""]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "certifi"
 version = "2026.5.20"
@@ -62,6 +67,11 @@ files = [
     {file = "certifi-2026.5.20-py3-none-any.whl", hash = "sha256:3c52e209ba0a4ad7aebe60436a4ab349c39e1e602e8c134221e546902ad25897"},
     {file = "certifi-2026.5.20.tar.gz", hash = "sha256:69dea482ab64caa7b9f6aba1c6bf48bb6a5448d1c0f1b17ab42ad8c763a5344d"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "charset-normalizer"
@@ -202,6 +212,11 @@ files = [
     {file = "charset_normalizer-3.4.7.tar.gz", hash = "sha256:ae89db9e5f98a11a4bf50407d4363e7b09b31e55bc117b4f7d80aab97ba009e5"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "click"
 version = "8.4.1"
@@ -217,6 +232,11 @@ files = [
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "colorama"
 version = "0.4.6"
@@ -229,6 +249,11 @@ files = [
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
 markers = {dev = "sys_platform == \"win32\"", lint = "platform_system == \"Windows\""}
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "flake8"
@@ -247,6 +272,11 @@ mccabe = ">=0.7.0,<0.8.0"
 pycodestyle = ">=2.14.0,<2.15.0"
 pyflakes = ">=3.4.0,<3.5.0"
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "idna"
 version = "3.17"
@@ -262,6 +292,11 @@ files = [
 [package.extras]
 all = ["mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "iniconfig"
 version = "2.3.0"
@@ -273,6 +308,11 @@ files = [
     {file = "iniconfig-2.3.0-py3-none-any.whl", hash = "sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12"},
     {file = "iniconfig-2.3.0.tar.gz", hash = "sha256:c76315c77db068650d49c5b56314774a7804df16fee4402c1f19d6d15d8c4730"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "isort"
@@ -288,6 +328,11 @@ files = [
 
 [package.extras]
 colors = ["colorama"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "librt"
@@ -390,6 +435,11 @@ files = [
     {file = "librt-0.11.0.tar.gz", hash = "sha256:075dc3ef4458a278e0195cbf6ac9d38808d9b906c5a6c7f7f79c3888276a3fb1"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "mccabe"
 version = "0.7.0"
@@ -401,6 +451,11 @@ files = [
     {file = "mccabe-0.7.0-py2.py3-none-any.whl", hash = "sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e"},
     {file = "mccabe-0.7.0.tar.gz", hash = "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "mypy"
@@ -473,6 +528,11 @@ mypyc = ["setuptools (>=50)"]
 native-parser = ["ast-serialize (>=0.1.1,<1.0.0)"]
 reports = ["lxml"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "mypy-extensions"
 version = "1.1.0"
@@ -485,6 +545,11 @@ files = [
     {file = "mypy_extensions-1.1.0.tar.gz", hash = "sha256:52e68efc3284861e772bbcd66823fde5ae21fd2fdb51c62a211403730b916558"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "packaging"
 version = "26.2"
@@ -496,6 +561,11 @@ files = [
     {file = "packaging-26.2-py3-none-any.whl", hash = "sha256:5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e"},
     {file = "packaging-26.2.tar.gz", hash = "sha256:ff452ff5a3e828ce110190feff1178bb1f2ea2281fa2075aadb987c2fb221661"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "pathspec"
@@ -514,6 +584,11 @@ hyperscan = ["hyperscan (>=0.7)"]
 optional = ["typing-extensions (>=4)"]
 re2 = ["google-re2 (>=1.1)"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "platformdirs"
 version = "4.10.0"
@@ -525,6 +600,11 @@ files = [
     {file = "platformdirs-4.10.0-py3-none-any.whl", hash = "sha256:fb516cdb12eb0d857d0cd85a7c57cea4d060bee4578d6cf5a14dfdf8cbf8784a"},
     {file = "platformdirs-4.10.0.tar.gz", hash = "sha256:31e761a6a0ca04faf7353ea759bdba55652be214725111e5aac52dfa29d4bef7"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "pluggy"
@@ -542,6 +622,11 @@ files = [
 dev = ["pre-commit", "tox"]
 testing = ["coverage", "pytest", "pytest-benchmark"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "pycodestyle"
 version = "2.14.0"
@@ -554,6 +639,11 @@ files = [
     {file = "pycodestyle-2.14.0.tar.gz", hash = "sha256:c4b5b517d278089ff9d0abdec919cd97262a3367449ea1c8b49b91529167b783"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "pyflakes"
 version = "3.4.0"
@@ -565,6 +655,11 @@ files = [
     {file = "pyflakes-3.4.0-py2.py3-none-any.whl", hash = "sha256:f742a7dbd0d9cb9ea41e9a24a918996e8170c799fa528688d40dd582c8265f4f"},
     {file = "pyflakes-3.4.0.tar.gz", hash = "sha256:b24f96fafb7d2ab0ec5075b7350b3d2d2218eab42003821c06344973d3ea2f58"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "pygments"
@@ -580,6 +675,11 @@ files = [
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "pytest"
@@ -602,6 +702,31 @@ pygments = ">=2.7.2"
 
 [package.extras]
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests", "setuptools", "xmlschema"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
+[[package]]
+name = "python-dotenv"
+version = "1.2.2"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a"},
+    {file = "python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "pytokens"
@@ -658,6 +783,11 @@ files = [
 [package.extras]
 dev = ["black", "build", "mypy", "pytest", "pytest-cov", "setuptools", "tox", "twine", "wheel"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "requests"
 version = "2.34.2"
@@ -680,6 +810,11 @@ urllib3 = ">=1.26,<3"
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<8)"]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [[package]]
 name = "typing-extensions"
 version = "4.15.0"
@@ -691,6 +826,11 @@ files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
 
 [[package]]
 name = "urllib3"
@@ -710,7 +850,12 @@ h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.cloud.tencent.com/pypi/simple"
+reference = "tencent"
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "e80694efbaff4a5696398944c5e3892af09d0d4e50b6f5143f60b8f900629a52"
+content-hash = "41cc61bb669c143c95ce17bb9b1bd107dc8a74eeccbf8638937dbe8acc287bf0"

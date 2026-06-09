@@ -7,7 +7,8 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "requests (>=2.34.2,<3.0.0)"
+    "requests (>=2.34.2,<3.0.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)"
 ]
 
 
@@ -53,3 +54,6 @@ name = "tencent"
 url = "https://mirrors.cloud.tencent.com/pypi/simple"
 priority = "primary"
 
+
+[tool.poetry.dependencies]
+python-dotenv = {source = "tencent"}
