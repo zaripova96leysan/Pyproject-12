@@ -1,96 +1,77 @@
 import json
 import os
-from pathlib import Path
-from typing import Any, Dict, List
-
 import requests
 from dotenv import load_dotenv
 
+# Загружаем переменные окружения
 load_dotenv()
 
+# Получаем API ключ
 API_KEY = os.getenv("EXCHANGE_API_KEY")
 
 
-def load_transactions_from_json(file_path: str) -> List[Dict[str, Any]]:
-    """
-    Загружает список транзакций из JSON-файла.
-
-    Args:
-        file_path (str): Путь к JSON-файлу
-
-    Returns:
-        List[Dict[str, Any]]: Список транзакций или пустой список
-    """
+def load_transaction(file_path: str) -> list:
+    """Загружает транзакции из JSON-файла"""
     try:
-        if not Path(file_path).exists():
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if isinstance(data, list):
+                return data
             return []
-
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read().strip()
-            if not content:
-                return []
-            data = json.loads(content)
-
-        if isinstance(data, list):
-            return data
-        return []
-    except (FileNotFoundError, json.JSONDecodeError, ValueError):
+    except (FileNotFoundError, json.JSONDecodeError):
         return []
 
 
-def convert_to_rub(transaction: Dict[str, Any]) -> float:
-    """
-    Конвертирует сумму транзакции из USD или EUR в рубли.
+def convert_to_rub(transaction: dict) -> float:
+    """Конвертирует сумму транзакции из USD или EUR в рубли"""
+    # Получаем данные из транзакции
+    operation_amount = transaction.get("operationAmount", {})
+    amount_str = operation_amount.get("amount")
+    currency_dict = operation_amount.get("currency", {})
+    currency_code = currency_dict.get("code")
 
-    Args:
-        transaction (Dict[str, Any]): Словарь с данными транзакции
-
-    Returns:
-        float: Сумма в рублях или 0.0 при ошибке
-    """
-    # Правильное извлечение данных из вложенной структуры
-    operation_amount = transaction.get('operationAmount')
-
-    if operation_amount is None:
-        return 0.0
-
-    amount_str = operation_amount.get('amount')
-    currency_info = operation_amount.get('currency', {})
-    currency_code = currency_info.get('code')
-
+    # Проверяем наличие данных
     if amount_str is None or currency_code is None:
         return 0.0
 
+    # Преобразуем сумму в число
     try:
         amount = float(amount_str)
     except (ValueError, TypeError):
         return 0.0
 
-    currency = str(currency_code).upper()
-
-    if currency == 'RUB':
+    # Если рубли - возвращаем как есть (НЕ проверяем API_KEY)
+    if currency_code == "RUB":
         return amount
 
-    if currency not in ['USD', 'EUR']:
+    # Если не USD и не EUR - не конвертируем
+    if currency_code not in ("USD", "EUR"):
         return 0.0
 
-    url = f"https://api.exchangerate-api.com/v4/latest/{currency}"
-    headers = {'api-key': API_KEY} if API_KEY else {}
+    # Для конвертации USD/EUR нужен API_KEY
+    # Если API_KEY нет, возвращаем 0.0
+    if not API_KEY:
+        return 0.0
 
+    # Выполняем запрос к API
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        url = "https://api.apilayer.com/exchangerates_data/latest"
+        headers = {"apikey": API_KEY}
+        params = {"base": currency_code, "symbols": "RUB"}
+
+        response = requests.get(url, headers=headers, params=params, timeout=10)
 
         if response.status_code != 200:
             return 0.0
 
         data = response.json()
-        rub_rate = data.get('rates', {}).get('RUB')
+        rub_rate = data.get("rates", {}).get("RUB")
 
         if rub_rate is None:
             return 0.0
 
-        result = amount * float(rub_rate)
+        result = amount * rub_rate
         return round(result, 2)
 
-    except Exception:
+    except (requests.RequestException, KeyError, ValueError, TypeError):
         return 0.0
